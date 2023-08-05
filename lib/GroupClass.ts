@@ -85,17 +85,18 @@ export class Group extends Node {
   ) {
     this.targetId = id;
     this.state = "delete";
-    this.children[id].updatePositionRule(terminateRule);
+    (this.children[id] as Point).updatePositionRule(terminateRule);
   }
 
   add(
     id: number,
+    pointId: number,
     beginRule: (handpose: Handpose, index: number) => Keypoint,
     terminateRule: (handpose: Handpose, index: number) => Keypoint
   ) {
-    const point = new Point({ x: 0, y: 0 }, 0);
+    const point = new Point({ x: 0, y: 0 }, pointId);
     point.setPositionRule(beginRule);
     point.updatePositionRule(terminateRule);
-    this.children.splice(id, 0, point);
+    (this.children as Point[]).splice(id, 0, point);
   }
 }
