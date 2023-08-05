@@ -2,102 +2,59 @@ import { Keypoint } from "@tensorflow-models/hand-pose-detection";
 import { Point } from "./PointClass";
 import p5Types from "p5";
 import { Handpose } from "../@types/global";
+import { Node } from "./NodeClass";
 
-export class Group {
-  position: Keypoint;
+export class Group extends Node {
   rotation: number;
   children: Group[] | Point[];
   origin: Keypoint;
-  t: number; //0-1; 0: begin, 1: terminate
   state: "add" | "delete" | "none";
   targetId: number;
-  sequence: {
-    at: number;
-    position: (handpose: Handpose, index: number) => Keypoint;
-  }[];
-  sequenceHead: number;
 
   constructor(children: Group[] | Point[]) {
-    this.position = { x: 0, y: 0 };
+    super({ x: 0, y: 0 });
     this.rotation = 0;
     this.children = children;
     this.origin = { x: 0, y: 0 };
-    this.t = 1;
     this.state = "none";
     this.targetId = 0;
-    this.sequence = [];
-    this.sequenceHead = 0;
+  }
+
+  updateGroupPosition(handpose: Handpose, index: number) {
+    this.updatePosition(handpose, index);
+    this.children.forEach((child: Group | Point, id) => {
+      if ("updateGroupPosition" in child) {
+        //Groupの場合
+        child.updateGroupPosition(handpose, id);
+      } else {
+        //Pointの場合
+        if (this.targetId == 0 && child.id == 0) {
+          //0のとき、child.id == 0となるが、もともと手首の位置にあたる0は、fingerの定義の段階で特殊なことをしているので、ここだけ例外処理が必要。
+          child.updatePosition(handpose, index);
+        } else {
+          child.updatePosition(handpose, (child as Point).id);
+        }
+      }
+    });
+
+    // if (this.state == "delete") {
+    //   console.log(this.children[this.targetId].getTransitionProgress());
+    // }
+    if (
+      this.state == "delete" &&
+      this.children[this.targetId].getTransitionProgress() >= 1
+    ) {
+      this.children.splice(this.targetId, 1);
+      this.state = "none";
+    }
   }
 
   show(p5: p5Types) {
     p5.push();
-    p5.translate(this.position.x, this.position.y);
-    p5.rotate(this.rotation);
-    const displayPos: Keypoint[] = [];
-    for (const child of this.children) {
-      displayPos.push(child.position);
-    }
 
-    if (this.t < 1) {
-      //特殊なpositionをassignする必要がある
-      if (this.state == "delete") {
-        if (this.targetId == 0) {
-          displayPos[0] = {
-            x:
-              (this.children[0] as Point).position.x * (1 - this.t) +
-              (this.children[1] as Point).position.x * this.t,
-            y:
-              (this.children[0] as Point).position.y * (1 - this.t) +
-              (this.children[1] as Point).position.y * this.t,
-          };
-          this.origin = displayPos[0];
-        } else if (this.targetId == this.children.length - 1) {
-          displayPos[this.targetId] = {
-            x:
-              (this.children[this.targetId] as Point).position.x *
-                (1 - this.t) +
-              (this.children[this.targetId - 1] as Point).position.x * this.t,
-            y:
-              (this.children[this.targetId] as Point).position.y *
-                (1 - this.t) +
-              (this.children[this.targetId - 1] as Point).position.y * this.t,
-          };
-        } else {
-          displayPos[this.targetId] = {
-            x:
-              (this.children[this.targetId] as Point).position.x *
-                (1 - this.t) +
-              (((this.children[this.targetId - 1] as Point).position.x +
-                (this.children[this.targetId + 1] as Point).position.x) /
-                2) *
-                this.t,
-            y:
-              (this.children[this.targetId] as Point).position.y *
-                (1 - this.t) +
-              (((this.children[this.targetId - 1] as Point).position.y +
-                (this.children[this.targetId + 1] as Point).position.y) /
-                2) *
-                this.t,
-          };
-        }
-      } else if (this.state == "add") {
-      }
-      this.t += 0.1;
-    }
-    if (this.t >= 1 && this.state == "delete") {
-      this.t = 1;
-      //   if (this.targetId == 0 && this.sequence.length > 0) {
-      //     const currentPos = this.position;
-      //     const originPos = this.origin;
-      //     const childPos = this.children[1].position;
-      //     this.position = {
-      //       x: currentPos.x + childPos.x - originPos.x,
-      //       y: currentPos.y + childPos.y - originPos.y,
-      //     };
-      //   }
-      this.children.splice(this.targetId, 1); //要素を削除
-      this.state = "none";
-    }
+    const currentPosition = this.getPosition();
+    p5.translate(currentPosition.x, currentPosition.y);
+    p5.rotate(this.rotation);
 
     this.children.forEach((child: Group | Point, index) => {
       if ("show" in child) {
@@ -106,10 +63,10 @@ export class Group {
       } else {
         //Pointの場合
         p5.strokeWeight(2);
-        const cPos = displayPos[index];
+        const cPos = child.getPosition();
         p5.circle(cPos.x - this.origin.x, cPos.y - this.origin.y, 10);
         if (index < this.children.length - 1) {
-          const nPos = displayPos[index + 1];
+          const nPos = this.children[index + 1].getPosition();
           p5.line(
             cPos.x - this.origin.x,
             cPos.y - this.origin.y,
@@ -122,13 +79,23 @@ export class Group {
     p5.pop();
   }
 
-  delete(id: number) {
-    this.t = 0;
-    this.state = "delete";
+  delete(
+    id: number,
+    terminateRule: (handpose: Handpose, index: number) => Keypoint
+  ) {
     this.targetId = id;
+    this.state = "delete";
+    this.children[id].updatePositionRule(terminateRule);
   }
 
-  updateOrigin(origin: Keypoint) {
-    this.position = origin;
+  add(
+    id: number,
+    beginRule: (handpose: Handpose, index: number) => Keypoint,
+    terminateRule: (handpose: Handpose, index: number) => Keypoint
+  ) {
+    const point = new Point({ x: 0, y: 0 }, 0);
+    point.setPositionRule(beginRule);
+    point.updatePositionRule(terminateRule);
+    this.children.splice(id, 0, point);
   }
 }
