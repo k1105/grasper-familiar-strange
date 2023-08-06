@@ -10,6 +10,7 @@ export class Group extends Node {
   origin: Keypoint;
   state: "add" | "delete" | "none";
   targetId: number;
+  originRule: (children: Group[] | Point[]) => Keypoint;
 
   constructor(children: Group[] | Point[]) {
     super({ x: 0, y: 0 });
@@ -18,6 +19,9 @@ export class Group extends Node {
     this.origin = { x: 0, y: 0 };
     this.state = "none";
     this.targetId = 0;
+    this.originRule = (children: Group[] | Point[]) => {
+      return { x: 0, y: 0 };
+    };
   }
 
   updateGroupPosition(handpose: Handpose, index: number) {
@@ -30,16 +34,14 @@ export class Group extends Node {
         //Pointの場合
         if (this.targetId == 0 && child.id == 0) {
           //0のとき、child.id == 0となるが、もともと手首の位置にあたる0は、fingerの定義の段階で特殊なことをしているので、ここだけ例外処理が必要。
+          //id周りはその場しのぎで使われていてルールが統一されていない。引数でindexを渡すことを廃し、this.idなどで処理できるようにすることが理想的？
           child.updatePosition(handpose, index);
         } else {
           child.updatePosition(handpose, (child as Point).id);
         }
       }
+      // this.updateOrigin(this.children);
     });
-
-    // if (this.state == "delete") {
-    //   console.log(this.children[this.targetId].getTransitionProgress());
-    // }
     if (
       this.state == "delete" &&
       this.children[this.targetId].getTransitionProgress() >= 1
@@ -49,11 +51,15 @@ export class Group extends Node {
     }
   }
 
+  updateOrigin(children: Group[] | Point[]) {
+    this.origin = this.originRule(children);
+  }
+
   show(p5: p5Types) {
     p5.push();
-
     const currentPosition = this.getPosition();
     p5.translate(currentPosition.x, currentPosition.y);
+    p5.translate(-this.origin.x, -this.origin.y);
     p5.rotate(this.rotation);
 
     this.children.forEach((child: Group | Point, index) => {
@@ -64,15 +70,10 @@ export class Group extends Node {
         //Pointの場合
         p5.strokeWeight(2);
         const cPos = child.getPosition();
-        p5.circle(cPos.x - this.origin.x, cPos.y - this.origin.y, 10);
+        p5.circle(cPos.x, cPos.y, 10);
         if (index < this.children.length - 1) {
           const nPos = this.children[index + 1].getPosition();
-          p5.line(
-            cPos.x - this.origin.x,
-            cPos.y - this.origin.y,
-            nPos.x - this.origin.x,
-            nPos.y - this.origin.y
-          );
+          p5.line(cPos.x, cPos.y, nPos.x, nPos.y);
         }
       }
     });

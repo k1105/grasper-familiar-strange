@@ -66,7 +66,11 @@ export const HandSketch = ({ handpose }: Props) => {
         y: window.innerHeight / 2 + 50,
       };
     });
+    leftFingers[i].originRule = (children: Group[] | Point[]) => {
+      return children[0].getPosition();
+    };
   }
+  const leftHand = new Group(leftFingers);
 
   const rightFingers: Group[] = [];
   for (let i = 0; i < 5; i++) {
@@ -79,6 +83,9 @@ export const HandSketch = ({ handpose }: Props) => {
         y: window.innerHeight / 2 + 50,
       };
     });
+    rightFingers[i].originRule = (children: Group[] | Point[]) => {
+      return children[0].getPosition();
+    };
   }
 
   const preload = (p5: p5Types) => {
@@ -126,7 +133,7 @@ export const HandSketch = ({ handpose }: Props) => {
       p5.fill(255, displayHands.left.opacity);
       leftFingers.forEach((finger, index) => {
         finger.updateGroupPosition(displayHands.left.pose, index);
-        finger.origin = finger.children[0].getPosition();
+        finger.updateOrigin(finger.children);
         finger.show(p5);
       });
       p5.pop();
@@ -134,19 +141,17 @@ export const HandSketch = ({ handpose }: Props) => {
 
     if (displayHands.right.pose.length > 0) {
       p5.push();
-      p5.fill(255, displayHands.left.opacity);
+      p5.fill(255, displayHands.right.opacity);
       rightFingers.forEach((finger, index) => {
         finger.updateGroupPosition(displayHands.right.pose, index);
-        finger.origin = finger.children[0].getPosition();
-        debugLog.current.push({
-          label: "progress " + index,
-          value: finger.children[1].getTransitionProgress(),
-        });
+        finger.updateOrigin(finger.children);
         finger.show(p5);
       });
       p5.pop();
     }
   };
+
+  // Animation
 
   setTimeout(() => {
     for (const finger of leftFingers) {
@@ -325,7 +330,7 @@ export const HandSketch = ({ handpose }: Props) => {
         }
       );
     });
-  }, 20000);
+  }, 19000);
 
   const windowResized = (p5: p5Types) => {
     p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
