@@ -26,6 +26,11 @@ export const HandSketch = ({ handpose }: Props) => {
   const displayHands = new DisplayHands();
 
   const debugLog = useRef<{ label: string; value: any }[]>([]);
+  const r = 80;
+
+  const timeList: number[] = [
+    10000, 12000, 15000, 18000, 22000, 24000, 26000, 36000,
+  ];
 
   const leftPoints: Point[] = [];
   for (let i = 0; i < 21; i++) {
@@ -63,7 +68,7 @@ export const HandSketch = ({ handpose }: Props) => {
     leftFingers[i].setPositionRule((handpose: Handpose, index: number) => {
       return {
         x: window.innerWidth / 2 - 300,
-        y: window.innerHeight / 2 + 50,
+        y: window.innerHeight / 2 + 150,
       };
     });
     leftFingers[i].originRule = (children: Group[] | Point[]) => {
@@ -80,7 +85,7 @@ export const HandSketch = ({ handpose }: Props) => {
     rightFingers[i].setPositionRule((handpose: Handpose, index: number) => {
       return {
         x: window.innerWidth / 2 + 300,
-        y: window.innerHeight / 2 + 50,
+        y: window.innerHeight / 2 + 150,
       };
     });
     rightFingers[i].originRule = (children: Group[] | Point[]) => {
@@ -158,7 +163,7 @@ export const HandSketch = ({ handpose }: Props) => {
       finger.updatePositionRule((handpose: Handpose, index: number) => {
         return {
           x: 200 * (index - 2) + window.innerWidth / 2 - 30,
-          y: window.innerHeight / 2 + 50,
+          y: window.innerHeight / 2 + 150,
         };
       });
     }
@@ -166,11 +171,11 @@ export const HandSketch = ({ handpose }: Props) => {
       finger.updatePositionRule((handpose: Handpose, index: number) => {
         return {
           x: 200 * (index - 2) + window.innerWidth / 2 + 30,
-          y: window.innerHeight / 2 + 50,
+          y: window.innerHeight / 2 + 150,
         };
       });
     }
-  }, 3000);
+  }, timeList[0]);
 
   setTimeout(() => {
     for (const finger of leftFingers) {
@@ -183,7 +188,7 @@ export const HandSketch = ({ handpose }: Props) => {
         return handpose[4 * index + 1];
       });
     }
-  }, 6000);
+  }, timeList[1]);
   setTimeout(() => {
     for (const finger of leftFingers) {
       finger.delete(1, (handpose: Handpose, index: number) => {
@@ -201,7 +206,7 @@ export const HandSketch = ({ handpose }: Props) => {
         };
       });
     }
-  }, 10000);
+  }, timeList[2]);
   setTimeout(() => {
     for (const finger of leftFingers) {
       finger.delete(1, (handpose: Handpose, index: number) => {
@@ -219,7 +224,7 @@ export const HandSketch = ({ handpose }: Props) => {
         };
       });
     }
-  }, 13000);
+  }, timeList[3]);
 
   setTimeout(() => {
     for (const finger of leftFingers) {
@@ -229,7 +234,7 @@ export const HandSketch = ({ handpose }: Props) => {
             x: handpose[index - 3].x,
             y: Math.max(
               Math.min(handpose[index].y, handpose[index - 3].y),
-              handpose[index - 3].y - 80
+              handpose[index - 3].y - r
             ),
           };
         }
@@ -242,13 +247,13 @@ export const HandSketch = ({ handpose }: Props) => {
             x: handpose[index - 3].x,
             y: Math.max(
               Math.min(handpose[index].y, handpose[index - 3].y),
-              handpose[index - 3].y - 80
+              handpose[index - 3].y - r
             ),
           };
         }
       );
     }
-  }, 15000);
+  }, timeList[4]);
 
   setTimeout(() => {
     for (const finger of leftFingers) {
@@ -256,7 +261,7 @@ export const HandSketch = ({ handpose }: Props) => {
         (handpose: Handpose, index: number) => {
           const dist = Math.min(
             Math.max(handpose[index - 3].y - handpose[index].y, 0),
-            80
+            r
           );
           return {
             x: handpose[index - 3].x,
@@ -270,7 +275,7 @@ export const HandSketch = ({ handpose }: Props) => {
         (handpose: Handpose, index: number) => {
           const dist = Math.min(
             Math.max(handpose[index - 3].y - handpose[index].y, 0),
-            80
+            r
           );
           return {
             x: handpose[index - 3].x,
@@ -279,7 +284,7 @@ export const HandSketch = ({ handpose }: Props) => {
         }
       );
     }
-  }, 18000);
+  }, timeList[5]);
 
   setTimeout(() => {
     leftFingers.forEach((finger, index) => {
@@ -297,7 +302,7 @@ export const HandSketch = ({ handpose }: Props) => {
         (handpose: Handpose, index: number) => {
           const dist = Math.min(
             Math.max(handpose[index * 4 + 1].y - handpose[index * 4 + 4].y, 0),
-            80
+            r
           );
           return {
             x: handpose[index * 4 + 1].x - Math.sqrt(1600 - (dist / 2) ** 2),
@@ -321,7 +326,7 @@ export const HandSketch = ({ handpose }: Props) => {
         (handpose: Handpose, index: number) => {
           const dist = Math.min(
             Math.max(handpose[index * 4 + 1].y - handpose[index * 4 + 4].y, 0),
-            80
+            r
           );
           return {
             x: handpose[index * 4 + 1].x + Math.sqrt(1600 - (dist / 2) ** 2),
@@ -330,7 +335,60 @@ export const HandSketch = ({ handpose }: Props) => {
         }
       );
     });
-  }, 19000);
+  }, timeList[6]);
+
+  setTimeout(() => {
+    leftFingers.forEach((finger, index) => {
+      finger.updatePositionRule((handpose: Handpose, index: number) => {
+        if (index > 0) {
+          let resY = 0;
+          for (let i = 1; i <= index; i++) {
+            resY -= Math.min(
+              Math.max(
+                handpose[4 * (i - 1) + 1].y - handpose[4 * (i - 1) + 4].y,
+                0
+              ),
+              r
+            );
+          }
+          return {
+            x: window.innerWidth / 2 - 50,
+            y: window.innerHeight / 2 + 150 + resY,
+          };
+        } else {
+          return {
+            x: window.innerWidth / 2 - 50,
+            y: window.innerHeight / 2 + 150,
+          };
+        }
+      });
+    });
+    rightFingers.forEach((finger, index) => {
+      finger.updatePositionRule((handpose: Handpose, index: number) => {
+        if (index > 0) {
+          let resY = 0;
+          for (let i = 1; i <= index; i++) {
+            resY -= Math.min(
+              Math.max(
+                handpose[4 * (i - 1) + 1].y - handpose[4 * (i - 1) + 4].y,
+                0
+              ),
+              r
+            );
+          }
+          return {
+            x: window.innerWidth / 2 + 50,
+            y: window.innerHeight / 2 + 150 + resY,
+          };
+        } else {
+          return {
+            x: window.innerWidth / 2 + 50,
+            y: window.innerHeight / 2 + 150,
+          };
+        }
+      });
+    });
+  }, timeList[7]);
 
   const windowResized = (p5: p5Types) => {
     p5.resizeCanvas(p5.windowWidth, p5.windowHeight);

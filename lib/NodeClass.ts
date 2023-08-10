@@ -1,5 +1,6 @@
 import { Keypoint } from "@tensorflow-models/hand-pose-detection";
 import { Handpose } from "../@types/global";
+import { quadraticInOut } from "./calculator/quadraticInOut";
 
 export class Node {
   private position: Keypoint;
@@ -35,8 +36,8 @@ export class Node {
       const currentPos = this.positionCurrentRule(handpose, index);
       const nextPos = this.positionNextRule(handpose, index);
       this.position = {
-        x: (1 - t) * currentPos.x + t * nextPos.x,
-        y: (1 - t) * currentPos.y + t * nextPos.y,
+        x: quadraticInOut(currentPos.x, nextPos.x, t),
+        y: quadraticInOut(currentPos.y, nextPos.y, t),
       };
       this.transitionProgress = Math.min(
         (new Date().getTime() - this.transitionBeginAt) / 1000,
