@@ -4,12 +4,15 @@ import p5Types from "p5";
 import { Handpose } from "../@types/global";
 import { Node } from "./NodeClass";
 
+type State = "add" | "delete" | "none";
+type AnimationType = "spring" | "quadratic";
+
 export class Group extends Node {
   rotation: number;
   children: Group[] | Point[];
   origin: Keypoint;
-  state: "add" | "delete" | "none";
   targetId: number;
+  private state: State;
   originRule: (children: Group[] | Point[]) => Keypoint;
 
   constructor(children: Group[] | Point[]) {
@@ -17,8 +20,8 @@ export class Group extends Node {
     this.rotation = 0;
     this.children = children;
     this.origin = { x: 0, y: 0 };
-    this.state = "none";
     this.targetId = 0;
+    this.state = "none";
     this.originRule = (children: Group[] | Point[]) => {
       return { x: 0, y: 0 };
     };
@@ -68,9 +71,12 @@ export class Group extends Node {
         child.show(p5);
       } else {
         //Pointの場合
+        if (index == this.targetId && this.state == "delete")
+          child.updateRadius();
+
         p5.strokeWeight(2);
         const cPos = child.getPosition();
-        p5.circle(cPos.x, cPos.y, 10);
+        p5.circle(cPos.x, cPos.y, child.radius);
         if (index < this.children.length - 1) {
           const nPos = this.children[index + 1].getPosition();
           p5.line(cPos.x, cPos.y, nPos.x, nPos.y);
@@ -82,22 +88,27 @@ export class Group extends Node {
 
   delete(
     id: number,
-    terminateRule: (handpose: Handpose, index: number) => Keypoint
+    terminateRule: (handpose: Handpose, index: number) => Keypoint,
+    animationType: AnimationType = "quadratic"
   ) {
     this.targetId = id;
     this.state = "delete";
-    (this.children[id] as Point).updatePositionRule(terminateRule);
+    (this.children[id] as Point).updatePositionRule(
+      terminateRule,
+      animationType
+    );
   }
 
   add(
     id: number,
     pointId: number,
     beginRule: (handpose: Handpose, index: number) => Keypoint,
-    terminateRule: (handpose: Handpose, index: number) => Keypoint
+    terminateRule: (handpose: Handpose, index: number) => Keypoint,
+    animationType: AnimationType = "quadratic"
   ) {
     const point = new Point({ x: 0, y: 0 }, pointId);
     point.setPositionRule(beginRule);
-    point.updatePositionRule(terminateRule);
+    point.updatePositionRule(terminateRule, animationType);
     (this.children as Point[]).splice(id, 0, point);
   }
 }
