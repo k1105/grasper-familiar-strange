@@ -26,71 +26,159 @@ export const HandSketch = ({ handpose }: Props) => {
   const displayHands = new DisplayHands();
 
   const debugLog = useRef<{ label: string; value: any }[]>([]);
-  const r = 80;
 
-  const timeList: number[] = [
-    10000, 12000, 15000, 18000, 22000, 26000, 36000, 46000, 50000, 55000,
-  ];
-
-  const leftPoints: Point[] = [];
-  for (let i = 0; i < 21; i++) {
-    leftPoints.push(new Point({ x: 0, y: 0 }, i));
-    if (i == 0) {
-      leftPoints[i].setPositionRule((handpose: Handpose, index: number) => {
-        return handpose[0];
-      });
-    } else {
-      leftPoints[i].setPositionRule((handpose: Handpose, index: number) => {
-        return handpose[index];
-      });
-    }
-  }
-
-  const rightPoints: Point[] = [];
-  for (let i = 0; i < 21; i++) {
-    rightPoints.push(new Point({ x: 0, y: 0 }, i));
-    if (i == 0) {
-      rightPoints[i].setPositionRule((handpose: Handpose, index: number) => {
-        return handpose[0];
-      });
-    } else {
-      rightPoints[i].setPositionRule((handpose: Handpose, index: number) => {
-        return handpose[index];
-      });
-    }
+  const timeList: number[] = [];
+  for (let i = 0; i < 20; i++) {
+    timeList.push((i + 1) * 5000);
   }
 
   const leftFingers: Group[] = [];
   for (let i = 0; i < 5; i++) {
-    leftFingers.push(
-      new Group([leftPoints[0], ...leftPoints.slice(4 * i + 1, 4 * i + 5)])
-    );
-    leftFingers[i].setPositionRule((handpose: Handpose, index: number) => {
+    const points: Point[] = [];
+    for (let j = 0; j < 5; j++) {
+      if (j == 0) {
+        points.push(new Point(0, { x: 0, y: 0 }, true, 0));
+      } else {
+        points.push(new Point(4 * i + j, { x: 0, y: 0 }, true, 4 * i + j));
+      }
+    }
+    points.push(new Point(20 + i, { x: 0, y: 0 }, false, 4 * i + 1));
+    points[5].setPosRule((handpose: Handpose, currentPoint: number) => {
+      const r = 40;
+      const dist = Math.min(
+        2 * r,
+        Math.max(handpose[currentPoint].y - handpose[currentPoint + 3].y, 0)
+      );
       return {
-        x: window.innerWidth / 2 - 300,
-        y: window.innerHeight / 2 + 150,
+        x: handpose[currentPoint].x - Math.sqrt(r ** 2 - (dist / 2) ** 2),
+        y: -dist / 2 + handpose[currentPoint].y,
       };
     });
-    leftFingers[i].originRule = (children: Group[] | Point[]) => {
-      return children[0].getPosition();
-    };
+    points.push(new Point(25 + i, { x: 0, y: 0 }, false, 4 * i + 1));
+    points[6].setPosRule((handpose: Handpose, currentPoint: number) => {
+      const r = 40;
+      const dist = Math.min(
+        2 * r,
+        Math.max(handpose[currentPoint].y - handpose[currentPoint + 3].y, 0)
+      );
+      return {
+        x: handpose[currentPoint].x,
+        y: -dist + handpose[currentPoint].y,
+      };
+    });
+    leftFingers.push(new Group(i, points));
+    leftFingers[i].setPositionSequence([
+      () => {
+        return {
+          x: window.innerWidth / 2 - 300,
+          y: window.innerHeight / 2 + 150,
+        };
+      },
+      (handpose: Handpose, groupId: number) => {
+        return {
+          x: window.innerWidth / 2 + 200 * (groupId - 2) - 30,
+          y: window.innerHeight / 2 + 150,
+        };
+      },
+      (handpose: Handpose, groupId: number) => {
+        if (groupId > 0) {
+          let resY = 0;
+          for (let i = 1; i <= groupId; i++) {
+            resY -= Math.min(
+              Math.max(
+                handpose[4 * (i - 1) + 1].y - handpose[4 * (i - 1) + 4].y,
+                0
+              ),
+              80
+            );
+          }
+          return {
+            x: window.innerWidth / 2 - 50,
+            y: window.innerHeight / 2 + 150 + resY,
+          };
+        } else {
+          return {
+            x: window.innerWidth / 2 - 50,
+            y: window.innerHeight / 2 + 150,
+          };
+        }
+      },
+    ]);
   }
-  const leftHand = new Group(leftFingers);
+  // const leftHand = new Group(leftFingers);
 
   const rightFingers: Group[] = [];
   for (let i = 0; i < 5; i++) {
-    rightFingers.push(
-      new Group([rightPoints[0], ...rightPoints.slice(4 * i + 1, 4 * i + 5)])
-    );
-    rightFingers[i].setPositionRule((handpose: Handpose, index: number) => {
+    const points: Point[] = [];
+    for (let j = 0; j < 5; j++) {
+      if (j == 0) {
+        points.push(new Point(0, { x: 0, y: 0 }, true, 0));
+      } else {
+        points.push(new Point(4 * i + j, { x: 0, y: 0 }, true, 4 * i + j));
+      }
+    }
+    points.push(new Point(20 + i, { x: 0, y: 0 }, false, 4 * i + 1));
+    points[5].setPosRule((handpose: Handpose, currentPoint: number) => {
+      const r = 40;
+      const dist = Math.min(
+        2 * r,
+        Math.max(handpose[currentPoint].y - handpose[currentPoint + 3].y, 0)
+      );
+      points.push(new Point(25 + i, { x: 0, y: 0 }, false, 4 * i + 1));
+      points[6].setPosRule((handpose: Handpose, currentPoint: number) => {
+        const r = 40;
+        const dist = Math.min(
+          2 * r,
+          Math.max(handpose[currentPoint].y - handpose[currentPoint + 3].y, 0)
+        );
+        return {
+          x: handpose[currentPoint].x,
+          y: -dist + handpose[currentPoint].y,
+        };
+      });
       return {
-        x: window.innerWidth / 2 + 300,
-        y: window.innerHeight / 2 + 150,
+        x: handpose[currentPoint].x + Math.sqrt(r ** 2 - (dist / 2) ** 2),
+        y: -dist / 2 + handpose[currentPoint].y,
       };
     });
-    rightFingers[i].originRule = (children: Group[] | Point[]) => {
-      return children[0].getPosition();
-    };
+    rightFingers.push(new Group(i, points));
+    rightFingers[i].setPositionSequence([
+      () => {
+        return {
+          x: window.innerWidth / 2 + 300,
+          y: window.innerHeight / 2 + 150,
+        };
+      },
+      (handpose: Handpose, groupId: number) => {
+        return {
+          x: window.innerWidth / 2 + 200 * (groupId - 2) + 30,
+          y: window.innerHeight / 2 + 150,
+        };
+      },
+      (handpose: Handpose, groupId: number) => {
+        if (groupId > 0) {
+          let resY = 0;
+          for (let i = 1; i <= groupId; i++) {
+            resY -= Math.min(
+              Math.max(
+                handpose[4 * (i - 1) + 1].y - handpose[4 * (i - 1) + 4].y,
+                0
+              ),
+              80
+            );
+          }
+          return {
+            x: window.innerWidth / 2 + 50,
+            y: window.innerHeight / 2 + 150 + resY,
+          };
+        } else {
+          return {
+            x: window.innerWidth / 2 + 50,
+            y: window.innerHeight / 2 + 150,
+          };
+        }
+      },
+    ]);
   }
 
   const preload = (p5: p5Types) => {
@@ -101,7 +189,7 @@ export const HandSketch = ({ handpose }: Props) => {
     p5.createCanvas(p5.windowWidth, p5.windowHeight).parent(canvasParentRef);
     p5.stroke(220);
     p5.fill(220);
-    p5.strokeWeight(10);
+    p5.strokeWeight(1);
   };
 
   const draw = (p5: p5Types) => {
@@ -137,8 +225,7 @@ export const HandSketch = ({ handpose }: Props) => {
       p5.push();
       p5.fill(220, displayHands.left.opacity);
       leftFingers.forEach((finger, index) => {
-        finger.updateGroupPosition(displayHands.left.pose, index);
-        finger.updateOrigin(finger.children);
+        finger.update(displayHands.left.pose);
         finger.show(p5);
       });
       p5.pop();
@@ -148,311 +235,140 @@ export const HandSketch = ({ handpose }: Props) => {
       p5.push();
       p5.fill(220, displayHands.right.opacity);
       rightFingers.forEach((finger, index) => {
-        finger.updateGroupPosition(displayHands.right.pose, index);
-        finger.updateOrigin(finger.children);
+        finger.update(displayHands.right.pose);
         finger.show(p5);
       });
       p5.pop();
     }
   };
 
-  // Animation
+  // // Animation
 
   setTimeout(() => {
     for (const finger of leftFingers) {
-      finger.updatePositionRule((handpose: Handpose, index: number) => {
-        return {
-          x: 200 * (index - 2) + window.innerWidth / 2 - 30,
-          y: window.innerHeight / 2 + 150,
-        };
-      });
+      finger.moveTo(1);
     }
     for (const finger of rightFingers) {
-      finger.updatePositionRule((handpose: Handpose, index: number) => {
-        return {
-          x: 200 * (index - 2) + window.innerWidth / 2 + 30,
-          y: window.innerHeight / 2 + 150,
-        };
-      });
+      finger.moveTo(1);
     }
   }, timeList[0]);
 
   setTimeout(() => {
     for (const finger of leftFingers) {
-      finger.delete(0, (handpose: Handpose, index: number) => {
-        return handpose[4 * index + 1];
-      });
+      finger.deactivate(0);
     }
     for (const finger of rightFingers) {
-      finger.delete(0, (handpose: Handpose, index: number) => {
-        return handpose[4 * index + 1];
-      });
+      finger.deactivate(0);
     }
   }, timeList[1]);
+
   setTimeout(() => {
     for (const finger of leftFingers) {
-      finger.delete(
-        1,
-        (handpose: Handpose, index: number) => {
-          return {
-            x: (handpose[index + 1].x + handpose[index - 1].x) / 2,
-            y: (handpose[index + 1].y + handpose[index - 1].y) / 2,
-          };
-        },
-        "spring"
-      );
+      finger.deactivate(4 * finger.id + 2);
     }
     for (const finger of rightFingers) {
-      finger.delete(
-        1,
-        (handpose: Handpose, index: number) => {
-          return {
-            x: (handpose[index + 1].x + handpose[index - 1].x) / 2,
-            y: (handpose[index + 1].y + handpose[index - 1].y) / 2,
-          };
-        },
-        "spring"
-      );
+      finger.deactivate(4 * finger.id + 2);
     }
   }, timeList[2]);
+
   setTimeout(() => {
     for (const finger of leftFingers) {
-      finger.delete(
-        1,
-        (handpose: Handpose, index: number) => {
-          return {
-            x: (handpose[index + 1].x + handpose[index - 2].x) / 2,
-            y: (handpose[index + 1].y + handpose[index - 2].y) / 2,
-          };
-        },
-        "spring"
-      );
+      finger.deactivate(4 * finger.id + 3);
     }
     for (const finger of rightFingers) {
-      finger.delete(
-        1,
-        (handpose: Handpose, index: number) => {
-          return {
-            x: (handpose[index + 1].x + handpose[index - 2].x) / 2,
-            y: (handpose[index + 1].y + handpose[index - 2].y) / 2,
-          };
-        },
-        "spring"
-      );
+      finger.deactivate(4 * finger.id + 3);
     }
   }, timeList[3]);
 
   setTimeout(() => {
     for (const finger of leftFingers) {
-      finger.children[1].updatePositionRule(
-        (handpose: Handpose, index: number) => {
-          const dist = Math.min(
-            Math.max(handpose[index - 3].y - handpose[index].y, 0),
-            r
-          );
-          return {
-            x: handpose[index - 3].x,
-            y: -dist + handpose[index - 3].y,
-          };
-        },
-        "spring"
-      );
+      finger.switch(4 * finger.id + 4, 25 + finger.id);
     }
     for (const finger of rightFingers) {
-      finger.children[1].updatePositionRule(
-        (handpose: Handpose, index: number) => {
-          const dist = Math.min(
-            Math.max(handpose[index - 3].y - handpose[index].y, 0),
-            r
-          );
-          return {
-            x: handpose[index - 3].x,
-            y: -dist + handpose[index - 3].y,
-          };
-        },
-        "spring"
-      );
+      finger.switch(4 * finger.id + 4, 25 + finger.id);
     }
   }, timeList[4]);
 
   setTimeout(() => {
-    leftFingers.forEach((finger, index) => {
-      finger.add(
-        1,
-        4 * index,
-        (handpose: Handpose, index: number) => {
-          return {
-            x: handpose[index + 1].x,
-            y:
-              (handpose[index + 3].y - handpose[index + 1].y) / 2 +
-              handpose[index + 1].y,
-          };
-        },
-        (handpose: Handpose, index: number) => {
-          const dist = Math.min(
-            Math.max(handpose[index + 1].y - handpose[index + 4].y, 0),
-            r
-          );
-          return {
-            x: handpose[index + 1].x - Math.sqrt(1600 - (dist / 2) ** 2),
-            y: -dist / 2 + handpose[index + 1].y,
-          };
-        },
-        "spring"
-      );
-    });
-    rightFingers.forEach((finger, index) => {
-      finger.add(
-        1,
-        4 * index,
-        (handpose: Handpose, index: number) => {
-          return {
-            x: handpose[index + 1].x,
-            y:
-              (handpose[index + 3].y - handpose[index + 1].y) / 2 +
-              handpose[index + 1].y,
-          };
-        },
-        (handpose: Handpose, index: number) => {
-          const dist = Math.min(
-            Math.max(handpose[index + 1].y - handpose[index + 4].y, 0),
-            r
-          );
-          return {
-            x: handpose[index + 1].x + Math.sqrt(1600 - (dist / 2) ** 2),
-            y: -dist / 2 + handpose[index + 1].y,
-          };
-        },
-        "spring"
-      );
-    });
+    for (const finger of leftFingers) {
+      finger.activate(20 + finger.id);
+    }
+    for (const finger of rightFingers) {
+      finger.activate(20 + finger.id);
+    }
   }, timeList[5]);
 
   setTimeout(() => {
-    leftFingers.forEach((finger, index) => {
-      finger.updatePositionRule((handpose: Handpose, index: number) => {
-        if (index > 0) {
-          let resY = 0;
-          for (let i = 1; i <= index; i++) {
-            resY -= Math.min(
-              Math.max(
-                handpose[4 * (i - 1) + 1].y - handpose[4 * (i - 1) + 4].y,
-                0
-              ),
-              r
-            );
-          }
-          return {
-            x: window.innerWidth / 2 - 50,
-            y: window.innerHeight / 2 + 150 + resY,
-          };
-        } else {
-          return {
-            x: window.innerWidth / 2 - 50,
-            y: window.innerHeight / 2 + 150,
-          };
-        }
-      });
-    });
-    rightFingers.forEach((finger, index) => {
-      finger.updatePositionRule((handpose: Handpose, index: number) => {
-        if (index > 0) {
-          let resY = 0;
-          for (let i = 1; i <= index; i++) {
-            resY -= Math.min(
-              Math.max(
-                handpose[4 * (i - 1) + 1].y - handpose[4 * (i - 1) + 4].y,
-                0
-              ),
-              r
-            );
-          }
-          return {
-            x: window.innerWidth / 2 + 50,
-            y: window.innerHeight / 2 + 150 + resY,
-          };
-        } else {
-          return {
-            x: window.innerWidth / 2 + 50,
-            y: window.innerHeight / 2 + 150,
-          };
-        }
-      });
-    });
+    for (const finger of leftFingers) {
+      finger.moveTo(2);
+    }
+    for (const finger of rightFingers) {
+      finger.moveTo(2);
+    }
   }, timeList[6]);
 
   setTimeout(() => {
     for (const finger of leftFingers) {
-      finger.updatePositionRule((handpose: Handpose, index: number) => {
-        return {
-          x: 200 * (index - 2) + window.innerWidth / 2 - 30,
-          y: window.innerHeight / 2 + 150,
-        };
-      });
+      finger.moveTo(1);
     }
     for (const finger of rightFingers) {
-      finger.updatePositionRule((handpose: Handpose, index: number) => {
-        return {
-          x: 200 * (index - 2) + window.innerWidth / 2 + 30,
-          y: window.innerHeight / 2 + 150,
-        };
-      });
+      finger.moveTo(1);
     }
   }, timeList[7]);
 
   setTimeout(() => {
     for (const finger of leftFingers) {
-      finger.delete(
-        1,
-        (handpose: Handpose, index: number) => {
-          const dist = Math.min(
-            Math.max(handpose[index + 1].y - handpose[index + 4].y, 0),
-            r
-          );
-          return {
-            x: handpose[index + 1].x,
-            y: -dist / 2 + handpose[index + 1].y,
-          };
-        },
-        "spring"
-      );
+      finger.deactivate(20 + finger.id);
     }
     for (const finger of rightFingers) {
-      finger.delete(
-        1,
-        (handpose: Handpose, index: number) => {
-          const dist = Math.min(
-            Math.max(handpose[index + 1].y - handpose[index + 4].y, 0),
-            r
-          );
-          return {
-            x: handpose[index + 1].x,
-            y: -dist / 2 + handpose[index + 1].y,
-          };
-        },
-        "spring"
-      );
+      finger.deactivate(20 + finger.id);
     }
   }, timeList[8]);
 
   setTimeout(() => {
     for (const finger of leftFingers) {
-      finger.children[1].updatePositionRule(
-        (handpose: Handpose, index: number) => {
-          return handpose[index];
-        },
-        "spring"
-      );
+      finger.switch(25 + finger.id, 4 * finger.id + 4);
     }
     for (const finger of rightFingers) {
-      finger.children[1].updatePositionRule(
-        (handpose: Handpose, index: number) => {
-          return handpose[index];
-        },
-        "spring"
-      );
+      finger.switch(25 + finger.id, 4 * finger.id + 4);
     }
   }, timeList[9]);
+
+  setTimeout(() => {
+    for (const finger of leftFingers) {
+      finger.activate(4 * finger.id + 3);
+    }
+    for (const finger of rightFingers) {
+      finger.activate(4 * finger.id + 3);
+    }
+  }, timeList[10]);
+
+  setTimeout(() => {
+    for (const finger of leftFingers) {
+      finger.activate(4 * finger.id + 2);
+    }
+    for (const finger of rightFingers) {
+      finger.activate(4 * finger.id + 2);
+    }
+  }, timeList[11]);
+
+  setTimeout(() => {
+    for (const finger of leftFingers) {
+      finger.activate(0);
+    }
+    for (const finger of rightFingers) {
+      finger.activate(0);
+    }
+  }, timeList[12]);
+
+  setTimeout(() => {
+    for (const finger of leftFingers) {
+      finger.moveTo(0);
+    }
+    for (const finger of rightFingers) {
+      finger.moveTo(0);
+    }
+  }, timeList[13]);
 
   const windowResized = (p5: p5Types) => {
     p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
