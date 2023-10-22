@@ -6,7 +6,6 @@ import { getSmoothedHandpose } from "../lib/getSmoothedHandpose";
 import { convertHandToHandpose } from "../lib/converter/convertHandToHandpose";
 import { isFront } from "../lib/detector/isFront";
 import { Monitor } from "../components/Monitor";
-import { Recorder } from "../components/Recorder";
 import { Handpose } from "../@types/global";
 import { DisplayHands } from "../lib/DisplayHandsClass";
 import { HandposeHistory } from "../lib/HandposeHitsoryClass";
@@ -24,6 +23,7 @@ const Sketch = dynamic(import("react-p5"), {
 export const HandSketch = ({ handpose }: Props) => {
   const handposeHistory = new HandposeHistory();
   const displayHands = new DisplayHands();
+  const gainRef = useRef<number>(1);
 
   const debugLog = useRef<{ label: string; value: any }[]>([]);
 
@@ -376,8 +376,7 @@ export const HandSketch = ({ handpose }: Props) => {
 
   return (
     <>
-      <Monitor handpose={handpose} debugLog={debugLog} />
-      <Recorder handpose={handpose} />
+      <Monitor handpose={handpose} debugLog={debugLog} gain={gainRef} />
       <Sketch
         preload={preload}
         setup={setup}
