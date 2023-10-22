@@ -11,6 +11,7 @@ import { DisplayHands } from "../lib/DisplayHandsClass";
 import { HandposeHistory } from "../lib/HandposeHitsoryClass";
 import { Point } from "../lib/PointClass";
 import { Group } from "../lib/GroupClass";
+import { animationSequence } from "../components/animationSequence";
 
 type Props = {
   handpose: MutableRefObject<Hand[]>;
@@ -242,133 +243,14 @@ export const HandSketch = ({ handpose }: Props) => {
     }
   };
 
+  animationSequence(leftFingers);
+  animationSequence(rightFingers);
+
   // // Animation
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.moveTo(1);
-    }
-    for (const finger of rightFingers) {
-      finger.moveTo(1);
-    }
-  }, timeList[0]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.deactivate(0);
-    }
-    for (const finger of rightFingers) {
-      finger.deactivate(0);
-    }
-  }, timeList[1]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.deactivate(4 * finger.id + 2);
-    }
-    for (const finger of rightFingers) {
-      finger.deactivate(4 * finger.id + 2);
-    }
-  }, timeList[2]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.deactivate(4 * finger.id + 3);
-    }
-    for (const finger of rightFingers) {
-      finger.deactivate(4 * finger.id + 3);
-    }
-  }, timeList[3]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.switch(4 * finger.id + 4, 25 + finger.id);
-    }
-    for (const finger of rightFingers) {
-      finger.switch(4 * finger.id + 4, 25 + finger.id);
-    }
-  }, timeList[4]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.activate(20 + finger.id);
-    }
-    for (const finger of rightFingers) {
-      finger.activate(20 + finger.id);
-    }
-  }, timeList[5]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.moveTo(2);
-    }
-    for (const finger of rightFingers) {
-      finger.moveTo(2);
-    }
-  }, timeList[6]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.moveTo(1);
-    }
-    for (const finger of rightFingers) {
-      finger.moveTo(1);
-    }
-  }, timeList[7]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.deactivate(20 + finger.id);
-    }
-    for (const finger of rightFingers) {
-      finger.deactivate(20 + finger.id);
-    }
-  }, timeList[8]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.switch(25 + finger.id, 4 * finger.id + 4);
-    }
-    for (const finger of rightFingers) {
-      finger.switch(25 + finger.id, 4 * finger.id + 4);
-    }
-  }, timeList[9]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.activate(4 * finger.id + 3);
-    }
-    for (const finger of rightFingers) {
-      finger.activate(4 * finger.id + 3);
-    }
-  }, timeList[10]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.activate(4 * finger.id + 2);
-    }
-    for (const finger of rightFingers) {
-      finger.activate(4 * finger.id + 2);
-    }
-  }, timeList[11]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.activate(0);
-    }
-    for (const finger of rightFingers) {
-      finger.activate(0);
-    }
-  }, timeList[12]);
-
-  setTimeout(() => {
-    for (const finger of leftFingers) {
-      finger.moveTo(0);
-    }
-    for (const finger of rightFingers) {
-      finger.moveTo(0);
-    }
-  }, timeList[13]);
+  setInterval(() => {
+    animationSequence(leftFingers);
+    animationSequence(rightFingers);
+  }, 5000 * 15);
 
   const windowResized = (p5: p5Types) => {
     p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
