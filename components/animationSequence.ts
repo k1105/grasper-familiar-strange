@@ -20,25 +20,25 @@ export const animationSequence = (fingers: Group[]) => {
 
   setTimeout(() => {
     for (const finger of fingers) {
-      finger.deactivate(4 * finger.id + 2);
+      finger.deactivate(4 * finger.id + 2, "spring");
     }
   }, timeList[2]);
 
   setTimeout(() => {
     for (const finger of fingers) {
-      finger.deactivate(4 * finger.id + 3);
+      finger.deactivate(4 * finger.id + 3, "spring");
     }
   }, timeList[3]);
 
   setTimeout(() => {
     for (const finger of fingers) {
-      finger.switch(4 * finger.id + 4, 25 + finger.id);
+      finger.switch(4 * finger.id + 4, 25 + finger.id, "spring");
     }
   }, timeList[4]);
 
   setTimeout(() => {
     for (const finger of fingers) {
-      finger.activate(20 + finger.id);
+      finger.activate(20 + finger.id, "spring");
     }
   }, timeList[5]);
 
@@ -56,13 +56,13 @@ export const animationSequence = (fingers: Group[]) => {
 
   setTimeout(() => {
     for (const finger of fingers) {
-      finger.deactivate(20 + finger.id);
+      finger.deactivate(20 + finger.id, "spring");
     }
   }, timeList[8]);
 
   setTimeout(() => {
     for (const finger of fingers) {
-      finger.switch(25 + finger.id, 4 * finger.id + 4);
+      finger.switch(25 + finger.id, 4 * finger.id + 4, "spring");
     }
   }, timeList[9]);
 
