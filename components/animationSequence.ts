@@ -3,7 +3,7 @@ import { Group } from "../lib/GroupClass";
 export const animationSequence = (fingers: Group[]) => {
   const timeList: number[] = [];
   for (let i = 0; i < 20; i++) {
-    timeList.push((i + 1) * 5000);
+    timeList.push((i + 1) * 15000);
   }
 
   setTimeout(() => {
