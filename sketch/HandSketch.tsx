@@ -25,6 +25,7 @@ export const HandSketch = ({ handpose }: Props) => {
   const handposeHistory = new HandposeHistory();
   const displayHands = new DisplayHands();
   const gainRef = useRef<number>(1);
+  const scene01FinishRef = useRef<Boolean>(true);
 
   const debugLog = useRef<{ label: string; value: any }[]>([]);
 
@@ -241,16 +242,14 @@ export const HandSketch = ({ handpose }: Props) => {
       });
       p5.pop();
     }
+
+    // // Animation
+    if (scene01FinishRef.current) {
+      animationSequence(leftFingers, scene01FinishRef);
+      animationSequence(rightFingers, scene01FinishRef);
+      scene01FinishRef.current = false;
+    }
   };
-
-  animationSequence(leftFingers);
-  animationSequence(rightFingers);
-
-  // // Animation
-  setInterval(() => {
-    animationSequence(leftFingers);
-    animationSequence(rightFingers);
-  }, 5000 * 15);
 
   const windowResized = (p5: p5Types) => {
     p5.resizeCanvas(p5.windowWidth, p5.windowHeight);

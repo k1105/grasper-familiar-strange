@@ -1,9 +1,13 @@
+import { MutableRefObject } from "react";
 import { Group } from "../lib/GroupClass";
 
-export const animationSequence = (fingers: Group[]) => {
+export const animationSequence = (
+  fingers: Group[],
+  finishRef: MutableRefObject<Boolean>
+) => {
   const timeList: number[] = [];
   for (let i = 0; i < 20; i++) {
-    timeList.push((i + 1) * 5000);
+    timeList.push((i + 1) * 10000);
   }
 
   setTimeout(() => {
@@ -89,4 +93,8 @@ export const animationSequence = (fingers: Group[]) => {
       finger.moveTo(0);
     }
   }, timeList[13]);
+
+  setTimeout(() => {
+    finishRef.current = true;
+  }, timeList[timeList.length - 1]);
 };
