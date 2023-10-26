@@ -5,9 +5,25 @@ export const animationSequence = (
   fingers: Group[],
   finishRef: MutableRefObject<Boolean>
 ) => {
-  const timeList: number[] = [];
-  for (let i = 0; i < 20; i++) {
-    timeList.push((i + 1) * 10000);
+  const timeList: number[] = [
+    10, //バラバラに
+    30, //下端が消滅
+    35, //中間、下から２番目が消滅
+    40, //中間、下から１番目が消滅
+    45, //縦軸に矯正
+    50, //中心部が分裂
+    60, //縦に積み重なるモーフィング
+    90, //もとに戻る
+    110, //中心部が消滅
+    130, //縦軸の矯正が解除
+    140, //中間、下から１番目が再生
+    145, //中間、下から２番目が再生
+    150, //下端が再生
+    130, //もとに戻る
+  ];
+
+  for (let i = 0; i < timeList.length; i++) {
+    timeList[i] *= 1000;
   }
 
   setTimeout(() => {
@@ -96,5 +112,5 @@ export const animationSequence = (
 
   setTimeout(() => {
     finishRef.current = true;
-  }, timeList[timeList.length - 1]);
+  }, timeList[timeList.length - 1] + 10 * 1000);
 };

@@ -143,7 +143,7 @@ export class Group {
         targetPosition,
         this.morphing.animation
       );
-      this.morphing.progress += 0.02;
+      this.morphing.progress += 0.001;
       if (this.morphing.progress > 1) {
         this.currentSequenceId = this.morphing.targetId as number;
         this.morphing = {
@@ -234,7 +234,7 @@ export class Group {
           });
         }
 
-        point.morphing.progress += 0.02;
+        point.morphing.progress += 0.005;
         if (point.morphing.progress > 1) {
           point.morphing.progress = 0;
           if (
