@@ -12,6 +12,7 @@ import { HandposeHistory } from "../lib/HandposeHitsoryClass";
 import { Point } from "../lib/PointClass";
 import { Group } from "../lib/GroupClass";
 import { animationSequence } from "../components/animationSequence";
+import { resizeHandpose } from "../lib/converter/resizeHandpose";
 
 type Props = {
   handpose: MutableRefObject<Hand[]>;
@@ -24,7 +25,7 @@ const Sketch = dynamic(import("react-p5"), {
 export const HandSketch = ({ handpose }: Props) => {
   const handposeHistory = new HandposeHistory();
   const displayHands = new DisplayHands();
-  const gainRef = useRef<number>(1);
+  const gainRef = useRef<number>(2);
   const scene01FinishRef = useRef<Boolean>(true);
 
   const debugLog = useRef<{ label: string; value: any }[]>([]);
@@ -200,10 +201,15 @@ export const HandSketch = ({ handpose }: Props) => {
       right: Handpose;
     } = convertHandToHandpose(handpose.current);
     handposeHistory.update(rawHands);
-    const hands: {
+    let hands: {
       left: Handpose;
       right: Handpose;
     } = getSmoothedHandpose(rawHands, handposeHistory); //平滑化された手指の動きを取得する
+
+    hands = {
+      left: resizeHandpose(hands.left, gainRef.current),
+      right: resizeHandpose(hands.right, gainRef.current),
+    };
 
     // logとしてmonitorに表示する
     debugLog.current = [];
