@@ -20,6 +20,7 @@ export default function App() {
   const requestRef = useRef<null | number>(null);
   const [ready, setReady] = useState<boolean>(false);
   const lostCountRef = useRef(0);
+  const lostAt = useRef(0);
   const sketchContainerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   // const timer = 120000;
@@ -42,6 +43,7 @@ export default function App() {
           lostCountRef.current = 0;
           titleRef.current!.style.opacity = "0";
           sketchContainerRef.current!.style.filter = "blur(0px)";
+          lostAt.current = Date.now();
         } else {
           lostCountRef.current++;
         }
@@ -55,7 +57,10 @@ export default function App() {
           titleRef.current!.style.opacity = "1";
         }
 
-        if (lostCountRef.current > 300) {
+        if (
+          lostAt.current !== 0 &&
+          Date.now() - lostAt.current > 2 * 60 * 1000
+        ) {
           location.reload();
         }
       }
@@ -80,7 +85,7 @@ export default function App() {
     };
 
     load();
-
+    lostAt.current = Date.now();
     setReady(true);
     // setInterval("location.reload()", timer);
   }, []);
