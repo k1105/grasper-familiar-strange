@@ -22,6 +22,7 @@ export default function App() {
   const [ready, setReady] = useState<boolean>(false);
   const lostCountRef = useRef(0);
   const lostAt = useRef(0);
+  const isLost = useRef<boolean>(true);
   const sketchContainerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   // const timer = 120000;
@@ -49,8 +50,10 @@ export default function App() {
           titleRef.current!.style.opacity = "0";
           sketchContainerRef.current!.style.filter = "blur(0px)";
           lostAt.current = Date.now();
+          isLost.current = false;
         } else {
           lostCountRef.current++;
+          isLost.current = true;
         }
 
         if (lostCountRef.current > 5) {
@@ -132,7 +135,7 @@ export default function App() {
             ref={sketchContainerRef}
             style={{ transition: "all 1000ms ease", filter: "blur(0px)" }}
           >
-            <HandSketch handpose={predictionsRef} />
+            <HandSketch handpose={predictionsRef} isLost={isLost} />
           </div>
         </>
       )}

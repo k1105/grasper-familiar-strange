@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 import p5Types from "p5";
-import { MutableRefObject, useRef } from "react";
+import { MutableRefObject, RefObject, useRef } from "react";
 import { Hand } from "@tensorflow-models/hand-pose-detection";
 import { getSmoothedHandpose } from "../lib/getSmoothedHandpose";
 import { convertHandToHandpose } from "../lib/converter/convertHandToHandpose";
@@ -16,13 +16,14 @@ import { resizeHandpose } from "../lib/converter/resizeHandpose";
 
 type Props = {
   handpose: MutableRefObject<Hand[]>;
+  isLost: RefObject<boolean>;
 };
 const Sketch = dynamic(import("react-p5"), {
   loading: () => <></>,
   ssr: false,
 });
 
-export const HandSketch = ({ handpose }: Props) => {
+export const HandSketch = ({ handpose, isLost }: Props) => {
   const handposeHistory = new HandposeHistory();
   const displayHands = new DisplayHands();
   const gainRef = useRef<number>(2);
@@ -250,7 +251,7 @@ export const HandSketch = ({ handpose }: Props) => {
     }
 
     // // Animation
-    if (scene01FinishRef.current) {
+    if (!isLost.current && scene01FinishRef.current) {
       animationSequence(leftFingers, scene01FinishRef);
       animationSequence(rightFingers, scene01FinishRef);
       scene01FinishRef.current = false;
