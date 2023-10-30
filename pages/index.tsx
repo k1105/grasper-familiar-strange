@@ -26,6 +26,7 @@ export default function App() {
   const isLost = useRef<boolean>(true);
   const sketchContainerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
+  const noUser = useRef<boolean>(true);
   // const timer = 120000;
 
   const capture = useCallback(async () => {
@@ -51,6 +52,7 @@ export default function App() {
           sketchContainerRef.current!.style.filter = "blur(0px)";
           lostAt.current = Date.now();
           isLost.current = false;
+          noUser.current = false;
         } else {
           lostCountRef.current++;
           isLost.current = true;
@@ -65,11 +67,16 @@ export default function App() {
           titleRef.current!.style.opacity = "1";
         }
 
-        if (
-          lostAt.current !== 0 &&
-          Date.now() - lostAt.current > 2 * 60 * 1000
-        ) {
-          location.reload();
+        if (lostAt.current !== 0) {
+          if (noUser.current) {
+            if (Date.now() - lostAt.current > 2 * 60 * 1000) {
+              location.reload();
+            }
+          } else {
+            if (Date.now() - lostAt.current > 20 * 1000) {
+              location.reload();
+            }
+          }
         }
       }
     }
@@ -122,7 +129,7 @@ export default function App() {
           width: "100vw",
           lineHeight: "100vh",
           textAlign: "center",
-          transition: "all 2s ease 5s",
+          transition: "all 2s ease 3s",
           opacity: "1",
         }}
       >
@@ -133,7 +140,7 @@ export default function App() {
         <>
           <div
             ref={sketchContainerRef}
-            style={{ transition: "all 1000ms ease", filter: "blur(0px)" }}
+            style={{ transition: "all 1500ms ease", filter: "blur(0px)" }}
           >
             <HandSketch handpose={predictionsRef} isLost={isLost} />
           </div>
