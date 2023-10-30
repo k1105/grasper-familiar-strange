@@ -48,7 +48,7 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
     }
     points.push(new Point(20 + i, { x: 0, y: 0 }, false, 4 * i + 1));
     points[5].setPosRule((handpose: Handpose, currentPoint: number) => {
-      const r = 40;
+      const r = 50;
       const dist = Math.min(
         2 * r,
         Math.max(handpose[currentPoint].y - handpose[currentPoint + 3].y, 0)
@@ -60,7 +60,7 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
     });
     points.push(new Point(25 + i, { x: 0, y: 0 }, false, 4 * i + 1));
     points[6].setPosRule((handpose: Handpose, currentPoint: number) => {
-      const r = 40;
+      const r = 50;
       const dist = Math.min(
         2 * r,
         Math.max(handpose[currentPoint].y - handpose[currentPoint + 3].y, 0)
@@ -123,14 +123,14 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
     }
     points.push(new Point(20 + i, { x: 0, y: 0 }, false, 4 * i + 1));
     points[5].setPosRule((handpose: Handpose, currentPoint: number) => {
-      const r = 40;
+      const r = 50;
       const dist = Math.min(
         2 * r,
         Math.max(handpose[currentPoint].y - handpose[currentPoint + 3].y, 0)
       );
       points.push(new Point(25 + i, { x: 0, y: 0 }, false, 4 * i + 1));
       points[6].setPosRule((handpose: Handpose, currentPoint: number) => {
-        const r = 40;
+        const r = 50;
         const dist = Math.min(
           2 * r,
           Math.max(handpose[currentPoint].y - handpose[currentPoint + 3].y, 0)

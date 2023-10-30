@@ -9,7 +9,11 @@ export class Point {
   pos: Keypoint;
   centerPoint: number; //handposeから何番目のpointを中心として取得するかを指定.
   isActive: boolean;
-  private posRule: (handpose: Handpose, centerPoint: number) => Keypoint;
+  private posRule: (
+    handpose: Handpose,
+    centerPoint: number,
+    oppositeHandpose: Handpose | null
+  ) => Keypoint;
 
   neighbors: { prevId: number | null; nextId: number | null };
   morphing: {
@@ -39,7 +43,13 @@ export class Point {
       animation: "quagratic",
     }; //targetId: switchの時のみ使用
   }
-  setPosRule(rule: (handpose: Handpose, centerPoint: number) => Keypoint) {
+  setPosRule(
+    rule: (
+      handpose: Handpose,
+      centerPoint: number,
+      oppositeHandpose: Handpose | null
+    ) => Keypoint
+  ) {
     this.posRule = rule;
   }
 
@@ -51,7 +61,7 @@ export class Point {
     this.isActive = state;
   }
 
-  update(handpose: Handpose) {
-    this.pos = this.posRule(handpose, this.centerPoint);
+  update(handpose: Handpose, oppositeHandpose: Handpose | null = null) {
+    this.pos = this.posRule(handpose, this.centerPoint, oppositeHandpose);
   }
 }
