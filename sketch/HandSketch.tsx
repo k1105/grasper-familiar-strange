@@ -93,7 +93,7 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
                 handpose[4 * (i - 1) + 1].y - handpose[4 * (i - 1) + 4].y,
                 0
               ),
-              80
+              50 * 2
             );
           }
           return {
@@ -168,7 +168,7 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
                 handpose[4 * (i - 1) + 1].y - handpose[4 * (i - 1) + 4].y,
                 0
               ),
-              80
+              50 * 2
             );
           }
           return {
