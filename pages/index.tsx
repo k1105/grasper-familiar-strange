@@ -27,6 +27,7 @@ export default function App() {
   const sketchContainerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const noUser = useRef<boolean>(true);
+  const pauseTracking = useRef<boolean>(false);
   // const timer = 120000;
 
   const capture = useCallback(async () => {
@@ -38,6 +39,7 @@ export default function App() {
 
       if (predictions) {
         if (
+          !pauseTracking.current &&
           predictions.length > 0 &&
           predictions.every((hand) => {
             return (
@@ -142,7 +144,11 @@ export default function App() {
             ref={sketchContainerRef}
             style={{ transition: "all 1500ms ease", filter: "blur(0px)" }}
           >
-            <HandSketch handpose={predictionsRef} isLost={isLost} />
+            <HandSketch
+              handpose={predictionsRef}
+              isLost={isLost}
+              pauseTracking={pauseTracking}
+            />
           </div>
         </>
       )}

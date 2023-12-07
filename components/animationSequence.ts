@@ -19,7 +19,7 @@ export const animationSequence = (
     160, //中間、下から１番目が再生
     165, //中間、下から２番目が再生
     170, //下端が再生
-    190, //もとに戻る
+    180, //もとに戻る
   ];
 
   for (let i = 0; i < timeList.length; i++) {
@@ -112,5 +112,5 @@ export const animationSequence = (
 
   setTimeout(() => {
     finishRef.current = true;
-  }, timeList[timeList.length - 1] + 10 * 1000);
+  }, timeList[timeList.length - 1] + 20 * 1000);
 };

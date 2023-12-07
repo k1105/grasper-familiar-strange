@@ -17,17 +17,19 @@ import { resizeHandpose } from "../lib/converter/resizeHandpose";
 type Props = {
   handpose: MutableRefObject<Hand[]>;
   isLost: RefObject<boolean>;
+  pauseTracking: MutableRefObject<boolean>;
 };
 const Sketch = dynamic(import("react-p5"), {
   loading: () => <></>,
   ssr: false,
 });
 
-export const HandSketch = ({ handpose, isLost }: Props) => {
+export const HandSketch = ({ handpose, isLost, pauseTracking }: Props) => {
   const handposeHistory = new HandposeHistory();
   const displayHands = new DisplayHands();
   const gainRef = useRef<number>(2);
   const scene01FinishRef = useRef<Boolean>(true);
+  const animationLoopCountRef = useRef<number>(0);
 
   const debugLog = useRef<{ label: string; value: any }[]>([]);
 
@@ -252,9 +254,11 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
 
     // // Animation
     if (!isLost.current && scene01FinishRef.current) {
+      if (animationLoopCountRef.current > 0) pauseTracking.current = true;
       animationSequence(leftFingers, scene01FinishRef);
       animationSequence(rightFingers, scene01FinishRef);
       scene01FinishRef.current = false;
+      animationLoopCountRef.current++;
     }
   };
 
