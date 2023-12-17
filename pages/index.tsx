@@ -31,7 +31,6 @@ export default function App() {
   const pauseTracking = useRef<boolean>(false);
   const messageRef = useRef<HTMLDivElement>(null);
   const instructionRef = useRef<HTMLDivElement>(null);
-  // const timer = 120000;
 
   const [switcher, setSwitcher] = useState<number>(0); //0->camera, 1->video
 
@@ -126,7 +125,12 @@ export default function App() {
     load();
     lostAt.current = Date.now();
     setReady(true);
-    // setInterval("location.reload()", timer);
+    const timer = 120000;
+    setInterval(() => {
+      if (noUser.current) {
+        location.reload();
+      }
+    }, timer);
   }, []);
 
   useEffect(() => {
