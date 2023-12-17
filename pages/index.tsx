@@ -117,7 +117,7 @@ export default function App() {
     load();
     lostAt.current = Date.now();
     setReady(true);
-    const timer = 120000;
+    const timer = 10 * 60 * 1000;
     setInterval(() => {
       if (noUser.current) {
         location.reload();
