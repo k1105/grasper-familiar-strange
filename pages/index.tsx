@@ -34,6 +34,8 @@ export default function App() {
   const [innerHeight, setInnerHeight] = useState<number>(0);
   // const timer = 120000;
 
+  const [switcher, setSwitcher] = useState<number>(0); //0->camera, 1->video
+
   const capture = useCallback(async () => {
     if (typeof webcamRef.current && modelRef.current) {
       //webcamとmodelのインスタンスが生成されていたら
@@ -102,6 +104,12 @@ export default function App() {
       requestRef.current = requestAnimationFrame(capture); //captureを実施
     }
   }, [ready]);
+
+  setInterval(() => {
+    if (noUser.current) {
+      setSwitcher((switcher + 1) % 2);
+    }
+  }, 2 * 60 * 1000);
 
   useEffect(() => {
     const load = async () => {
@@ -174,23 +182,40 @@ export default function App() {
           style={{ marginTop: "100px" }}
           alt="手前の台に手を近づけると、体験が始まります。"
         ></Image>
+
         <div
           style={{
             position: "absolute",
             right: 0,
-            top: -innerWidth / 4,
+            top: 0,
             zIndex: -1,
-            opacity: 0.3,
           }}
         >
-          <Webcam //手指の動きを取得するのに必要なカメラ映像
-            width={innerWidth}
-            height={innerWidth}
-            mirrored
-            id="webcam"
-            audio={false}
-            screenshotFormat="image/jpeg"
-          />
+          {switcher == 0 ? (
+            <iframe
+              src="https://www.youtube.com/embed/FSAat-dstbQ?autoplay=1&mute=1"
+              title="YouTube video player"
+              style={{
+                border: 0,
+                width: "100vw",
+                height: "100vh",
+                opacity: 0.5,
+              }}
+            ></iframe>
+          ) : (
+            <Webcam //手指の動きを取得するのに必要なカメラ映像
+              width={innerWidth}
+              height={innerWidth}
+              mirrored
+              id="webcam"
+              audio={false}
+              screenshotFormat="image/jpeg"
+              style={{
+                marginTop: -innerWidth / 4,
+                opacity: 0.3,
+              }}
+            />
+          )}
         </div>
       </div>
       <div
