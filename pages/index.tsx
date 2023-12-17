@@ -107,7 +107,7 @@ export default function App() {
     if (noUser.current) {
       setSwitcher((switcher + 1) % 2);
     }
-  }, 10 * 1000);
+  }, 2 * 60 * 1000);
 
   useEffect(() => {
     const load = async () => {
