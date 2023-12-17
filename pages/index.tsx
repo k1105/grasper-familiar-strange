@@ -32,8 +32,6 @@ export default function App() {
   const messageRef = useRef<HTMLDivElement>(null);
   const instructionRef = useRef<HTMLDivElement>(null);
 
-  const [switcher, setSwitcher] = useState<number>(0); //0->camera, 1->video
-
   const capture = useCallback(async () => {
     if (typeof webcamRef.current && modelRef.current) {
       //webcamとmodelのインスタンスが生成されていたら
@@ -103,12 +101,6 @@ export default function App() {
     }
   }, [ready]);
 
-  setInterval(() => {
-    if (noUser.current) {
-      setSwitcher((switcher + 1) % 2);
-    }
-  }, 2 * 60 * 1000);
-
   useEffect(() => {
     const load = async () => {
       const model = handPoseDetection.SupportedModels.MediaPipeHands;
@@ -158,7 +150,7 @@ export default function App() {
           opacity: "1",
         }}
       >
-        <ScreenSaver switcher={switcher} />
+        <ScreenSaver noUser={noUser} />
       </div>
       <div
         ref={messageRef}

@@ -1,11 +1,18 @@
 import Webcam from "react-webcam";
 import Image from "next/image";
+import { MutableRefObject, useState } from "react";
 
 type Props = {
-  switcher: number;
+  noUser: MutableRefObject<boolean>;
 };
 
-export const ScreenSaver = ({ switcher }: Props) => {
+export const ScreenSaver = ({ noUser }: Props) => {
+  const [switcher, setSwitcher] = useState<number>(0);
+  setInterval(() => {
+    if (noUser.current) {
+      setSwitcher((switcher + 1) % 2);
+    }
+  }, 2 * 60 * 1000);
   return (
     <>
       {/* 
