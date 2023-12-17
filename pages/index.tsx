@@ -31,8 +31,6 @@ export default function App() {
   const pauseTracking = useRef<boolean>(false);
   const messageRef = useRef<HTMLDivElement>(null);
   const instructionRef = useRef<HTMLDivElement>(null);
-  const [innerWidth, setInnerWidth] = useState<number>(0);
-  const [innerHeight, setInnerHeight] = useState<number>(0);
   // const timer = 120000;
 
   const [switcher, setSwitcher] = useState<number>(0); //0->camera, 1->video
@@ -110,7 +108,7 @@ export default function App() {
     if (noUser.current) {
       setSwitcher((switcher + 1) % 2);
     }
-  }, 2 * 60 * 1000);
+  }, 10 * 1000);
 
   useEffect(() => {
     const load = async () => {
@@ -129,8 +127,6 @@ export default function App() {
     lostAt.current = Date.now();
     setReady(true);
     // setInterval("location.reload()", timer);
-    setInnerWidth(window.innerWidth);
-    setInnerHeight(window.innerHeight);
   }, []);
 
   useEffect(() => {

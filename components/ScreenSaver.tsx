@@ -54,8 +54,6 @@ export const ScreenSaver = ({ switcher }: Props) => {
           ></iframe>
         ) : (
           <Webcam //手指の動きを取得するのに必要なカメラ映像
-            width={innerWidth}
-            height={innerWidth}
             mirrored
             id="webcam"
             audio={false}
@@ -63,6 +61,8 @@ export const ScreenSaver = ({ switcher }: Props) => {
             style={{
               marginTop: -innerWidth / 4,
               opacity: 0.3,
+              width: "100vw",
+              height: "100vw",
             }}
           />
         )}
