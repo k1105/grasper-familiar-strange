@@ -8,6 +8,7 @@ import Head from "next/head";
 import { Cormorant_Garamond } from "next/font/google";
 import { calcKeypointsTotalDistance } from "../lib/calculator/calcKeypointsTotalDistance";
 import Image from "next/image";
+import { ScreenSaver } from "../components/ScreenSaver";
 
 // If loading a variable font, you don't need to specify the font weight
 const garamond400 = Cormorant_Garamond({
@@ -175,48 +176,7 @@ export default function App() {
           opacity: "1",
         }}
       >
-        <Image
-          src="/img/instruction.png"
-          width={800}
-          height={800}
-          style={{ marginTop: "100px" }}
-          alt="手前の台に手を近づけると、体験が始まります。"
-        ></Image>
-
-        <div
-          style={{
-            position: "absolute",
-            right: 0,
-            top: 0,
-            zIndex: -1,
-          }}
-        >
-          {switcher == 0 ? (
-            <iframe
-              src="https://www.youtube.com/embed/FSAat-dstbQ?autoplay=1&mute=1"
-              title="YouTube video player"
-              style={{
-                border: 0,
-                width: "100vw",
-                height: "100vh",
-                opacity: 0.5,
-              }}
-            ></iframe>
-          ) : (
-            <Webcam //手指の動きを取得するのに必要なカメラ映像
-              width={innerWidth}
-              height={innerWidth}
-              mirrored
-              id="webcam"
-              audio={false}
-              screenshotFormat="image/jpeg"
-              style={{
-                marginTop: -innerWidth / 4,
-                opacity: 0.3,
-              }}
-            />
-          )}
-        </div>
+        <ScreenSaver switcher={switcher} />
       </div>
       <div
         ref={messageRef}
