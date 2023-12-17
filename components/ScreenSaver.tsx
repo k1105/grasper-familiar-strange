@@ -8,6 +8,23 @@ type Props = {
 export const ScreenSaver = ({ switcher }: Props) => {
   return (
     <>
+      {/* 
+      <div
+        ref={titleRef}
+        className={garamond400.className}
+        style={{
+          position: "absolute",
+          fontSize: "4rem",
+          top: "0",
+          width: "100vw",
+          lineHeight: "100vh",
+          textAlign: "center",
+          transition: "all 2s ease 3s",
+          opacity: "1",
+        }}
+      >
+        Familiar / Strange
+      </div> */}
       <Image
         src="/img/instruction.png"
         width={800}
